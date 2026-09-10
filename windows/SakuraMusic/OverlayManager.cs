@@ -25,7 +25,7 @@ public sealed class OverlayManager
         bool orderChanged = false;
         foreach (var window in tracked)
         {
-            bool shouldShow = _settings.Enabled && !window.Occluded;
+            bool shouldShow = _settings.Enabled && (!window.Occluded || _settings.AlwaysShow);
             if (!_overlays.TryGetValue(window.Handle, out var overlay))
             {
                 overlay = new OverlayWindow(_settings);

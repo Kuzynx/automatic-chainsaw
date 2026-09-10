@@ -54,6 +54,8 @@ For a quick test without building a bundle, `swift run` from the `macos/` folder
    - **Petals** sets density: Off, Light breeze, Gentle fall, Full bloom.
    - **Blush tint** sets the pink wash: Off, Soft, Deep.
    - **Blossom branch** shows or hides the corner branch.
+   - **Show even when covered** keeps the theme up when another window overlaps Music.
+     Handy on multi-monitor setups, e.g. Music on one display while a game runs on the other.
    - **Launch at Login** starts it with your Mac (built app only).
 4. **Quit Sakura Music** removes the overlay instantly.
 
@@ -89,7 +91,8 @@ Or during development, just `dotnet run` from that folder.
    bug report.
 2. Open Apple Music. The theme appears over the Music window.
 3. Right-click the tray icon to adjust **Enabled**, **Petals**, **Blush tint**,
-   **Blossom branch**, and **Launch at startup**.
+   **Blossom branch**, **Show even when covered** (keeps the theme up while a game runs on
+   another monitor), and **Launch at startup**.
 4. **Quit Sakura Music** removes the overlay instantly.
 
 ---

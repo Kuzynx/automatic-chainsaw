@@ -8,6 +8,8 @@ struct TrackedWindow: Equatable {
     /// True when some other app's window overlaps this one from above, in which case
     /// the overlay hides so it does not paint petals over the foreign window.
     let occluded: Bool
+    /// Name of the app whose window is on top of this one, when occluded.
+    let coveredBy: String?
     /// True when the window fills a whole display (full screen / zoomed), which
     /// means the window has square corners instead of the usual rounded ones.
     let fillsScreen: Bool
@@ -72,7 +74,7 @@ final class MusicWindowTracker {
 
         // The list is ordered front to back. Track foreign windows seen so far so we
         // can tell whether a Music window is covered by something above it.
-        var foreignRects: [CGRect] = []
+        var foreign: [(rect: CGRect, owner: String)] = []
         var result: [TrackedWindow] = []
 
         for info in list {
@@ -104,11 +106,13 @@ final class MusicWindowTracker {
                       let id = (info[kCGWindowNumber as String] as? NSNumber)?.uint32Value
                 else { continue }
 
-                let occluded = foreignRects.contains { $0.intersects(frame) }
+                let coveredBy = foreign.first { $0.rect.intersects(frame) }?.owner
                 let fillsScreen = screenFrames.contains { $0.equalTo(frame) }
-                result.append(TrackedWindow(id: id, frame: frame, occluded: occluded, fillsScreen: fillsScreen))
+                result.append(TrackedWindow(id: id, frame: frame, occluded: coveredBy != nil,
+                                            coveredBy: coveredBy, fillsScreen: fillsScreen))
             } else {
-                foreignRects.append(frame)
+                let owner = info[kCGWindowOwnerName as String] as? String ?? "another app"
+                foreign.append((frame, owner))
             }
         }
         return result

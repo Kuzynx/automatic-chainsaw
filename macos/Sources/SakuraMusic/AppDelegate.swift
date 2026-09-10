@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusLine: NSMenuItem!
     private var enabledItem: NSMenuItem!
     private var branchItem: NSMenuItem!
+    private var alwaysShowItem: NSMenuItem!
     private var loginItem: NSMenuItem!
     private var petalItems: [NSMenuItem] = []
     private var blushItems: [NSMenuItem] = []
@@ -25,7 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         tracker.onUpdate = { [weak self] windows in
             guard let self else { return }
             self.overlays.sync(with: windows)
-            self.updateStatusLine()
+            self.updateStatusLine(windows)
         }
         tracker.start()
     }
@@ -76,6 +77,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         branchItem.target = self
         menu.addItem(branchItem)
 
+        alwaysShowItem = NSMenuItem(title: "Show even when covered", action: #selector(toggleAlwaysShow), keyEquivalent: "")
+        alwaysShowItem.target = self
+        alwaysShowItem.toolTip = "Keep the theme up when another window overlaps Music, e.g. while a game runs on another display."
+        menu.addItem(alwaysShowItem)
+
         menu.addItem(.separator())
 
         loginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
@@ -93,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func refreshMenuState() {
         enabledItem.state = settings.enabled ? .on : .off
         branchItem.state = settings.showBranch ? .on : .off
+        alwaysShowItem.state = settings.alwaysShow ? .on : .off
         for item in petalItems { item.state = item.tag == settings.petals.rawValue ? .on : .off }
         for item in blushItems { item.state = item.tag == settings.blush.rawValue ? .on : .off }
         loginItem.state = SMAppService.mainApp.status == .enabled ? .on : .off
@@ -101,7 +108,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var lastStatusText = ""
 
-    private func updateStatusLine() {
+    private func updateStatusLine(_ windows: [TrackedWindow]) {
         let text: String
         if !tracker.musicIsRunning {
             text = "Music is not running"
@@ -109,7 +116,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             text = "Paused"
         } else {
             switch overlays.visibleCount {
-            case 0: text = "Music is hidden or covered"
+            case 0 where windows.isEmpty: text = "Music window is minimised or on another Space"
+            case 0:
+                if let owner = windows.compactMap(\.coveredBy).first {
+                    text = "Covered by \(owner)"
+                } else {
+                    text = "Music is hidden or covered"
+                }
             case 1: text = "Blooming over Music"
             case let n: text = "Blooming over \(n) Music windows"
             }
@@ -128,6 +141,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func toggleBranch() {
         settings.showBranch.toggle()
+    }
+
+    @objc private func toggleAlwaysShow() {
+        settings.alwaysShow.toggle()
     }
 
     @objc private func choosePetals(_ sender: NSMenuItem) {

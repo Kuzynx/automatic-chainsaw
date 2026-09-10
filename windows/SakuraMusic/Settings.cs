@@ -20,11 +20,15 @@ public sealed class Settings
     private PetalDensity _petals = PetalDensity.Normal;
     private Blush _blush = Blush.Soft;
     private bool _showBranch = true;
+    private bool _alwaysShow;
 
     public bool Enabled { get => _enabled; set { _enabled = value; Save(); } }
     public PetalDensity Petals { get => _petals; set { _petals = value; Save(); } }
     public Blush Blush { get => _blush; set { _blush = value; Save(); } }
     public bool ShowBranch { get => _showBranch; set { _showBranch = value; Save(); } }
+
+    /// <summary>Keep the overlay up even when another window overlaps Music.</summary>
+    public bool AlwaysShow { get => _alwaysShow; set { _alwaysShow = value; Save(); } }
 
     [JsonIgnore]
     public double PetalMultiplier => _petals switch

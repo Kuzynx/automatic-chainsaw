@@ -4,7 +4,7 @@ using System.Windows.Threading;
 
 namespace SakuraMusic;
 
-public readonly record struct TrackedWindow(IntPtr Handle, Native.RECT Frame, bool Occluded, bool FillsScreen);
+public readonly record struct TrackedWindow(IntPtr Handle, Native.RECT Frame, bool Occluded, bool FillsScreen, string? CoveredBy);
 
 /// <summary>
 /// Polls the top-level window list for Apple Music windows. EnumWindows reports
@@ -99,7 +99,7 @@ public sealed class MusicWindowTracker
         var pids = MusicPids();
         var foreground = Native.GetForegroundWindow();
         var result = new List<TrackedWindow>();
-        var foreign = new List<Native.RECT>();
+        var foreign = new List<(Native.RECT rect, string label)>();
 
         Native.EnumWindows((hWnd, _) =>
         {
@@ -126,9 +126,14 @@ public sealed class MusicWindowTracker
                 else
                 {
                     // The foreground window can't have anything but topmost overlays above it.
-                    bool occluded = hWnd != foreground && foreign.Any(f => f.Intersects(rect));
-                    result.Add(new TrackedWindow(hWnd, rect, occluded, Native.FillsMonitor(rect)));
-                    verdict = occluded ? "MUSIC (occluded)" : "MUSIC";
+                    string? coveredBy = null;
+                    if (hWnd != foreground)
+                    {
+                        var r = rect;
+                        coveredBy = foreign.FirstOrDefault(f => f.rect.Intersects(r)).label;
+                    }
+                    result.Add(new TrackedWindow(hWnd, rect, coveredBy != null, Native.FillsMonitor(rect), coveredBy));
+                    verdict = coveredBy != null ? $"MUSIC (covered by {coveredBy})" : "MUSIC";
                 }
             }
             else if (!Native.CanOcclude(hWnd))
@@ -137,7 +142,7 @@ public sealed class MusicWindowTracker
             }
             else
             {
-                foreign.Add(rect);
+                foreign.Add((rect, title.Length > 0 ? title : cls));
                 verdict = "occluder";
             }
 

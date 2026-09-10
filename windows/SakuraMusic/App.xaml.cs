@@ -20,6 +20,7 @@ public partial class App : System.Windows.Application
     private ToolStripMenuItem? _statusItem;
     private ToolStripMenuItem? _enabledItem;
     private ToolStripMenuItem? _branchItem;
+    private ToolStripMenuItem? _alwaysShowItem;
     private ToolStripMenuItem? _loginItem;
     private readonly List<ToolStripMenuItem> _petalItems = new();
     private readonly List<ToolStripMenuItem> _blushItems = new();
@@ -58,7 +59,7 @@ public partial class App : System.Windows.Application
         _tracker.Updated += windows =>
         {
             _overlays.Sync(windows);
-            UpdateStatusLine();
+            UpdateStatusLine(windows);
         };
         _tracker.Start();
     }
@@ -109,6 +110,12 @@ public partial class App : System.Windows.Application
         _branchItem = new ToolStripMenuItem("Blossom branch", null, (_, _) => _settings.ShowBranch = !_settings.ShowBranch);
         menu.Items.Add(_branchItem);
 
+        _alwaysShowItem = new ToolStripMenuItem("Show even when covered", null, (_, _) => _settings.AlwaysShow = !_settings.AlwaysShow)
+        {
+            ToolTipText = "Keep the theme up when another window overlaps Music, e.g. while a game runs on another monitor.",
+        };
+        menu.Items.Add(_alwaysShowItem);
+
         menu.Items.Add(new ToolStripSeparator());
         _loginItem = new ToolStripMenuItem("Launch at startup", null, (_, _) => ToggleLaunchAtStartup());
         menu.Items.Add(_loginItem);
@@ -131,6 +138,7 @@ public partial class App : System.Windows.Application
     {
         if (_enabledItem != null) _enabledItem.Checked = _settings.Enabled;
         if (_branchItem != null) _branchItem.Checked = _settings.ShowBranch;
+        if (_alwaysShowItem != null) _alwaysShowItem.Checked = _settings.AlwaysShow;
         foreach (var item in _petalItems) item.Checked = (PetalDensity)item.Tag! == _settings.Petals;
         foreach (var item in _blushItems) item.Checked = (Blush)item.Tag! == _settings.Blush;
         if (_loginItem != null) _loginItem.Checked = IsLaunchAtStartup();
@@ -138,7 +146,7 @@ public partial class App : System.Windows.Application
 
     private string _lastStatus = "";
 
-    private void UpdateStatusLine()
+    private void UpdateStatusLine(IReadOnlyList<TrackedWindow> windows)
     {
         string text;
         if (!_tracker.MusicIsRunning) text = "Apple Music is not running";
@@ -146,8 +154,11 @@ public partial class App : System.Windows.Application
         else
         {
             int n = _overlays.VisibleCount;
+            var covered = windows.FirstOrDefault(w => w.CoveredBy != null).CoveredBy;
             text = n switch
             {
+                0 when windows.Count == 0 => "Apple Music window is minimised or hidden",
+                0 when covered != null => $"Covered by \"{covered}\"",
                 0 => "Apple Music is hidden or covered",
                 1 => "Blooming over Apple Music",
                 _ => $"Blooming over {n} Apple Music windows",

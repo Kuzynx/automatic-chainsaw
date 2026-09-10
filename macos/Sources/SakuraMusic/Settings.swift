@@ -52,6 +52,7 @@ final class Settings {
         static let petals = "petalDensity"
         static let blush = "blush"
         static let branch = "showBranch"
+        static let alwaysShow = "alwaysShow"
     }
 
     private let defaults = UserDefaults.standard
@@ -63,6 +64,7 @@ final class Settings {
             Key.petals: PetalDensity.normal.rawValue,
             Key.blush: Blush.soft.rawValue,
             Key.branch: true,
+            Key.alwaysShow: false,
         ])
     }
 
@@ -84,5 +86,11 @@ final class Settings {
     var showBranch: Bool {
         get { defaults.bool(forKey: Key.branch) }
         set { defaults.set(newValue, forKey: Key.branch); onChange?() }
+    }
+
+    /// Keep the overlay up even when another app's window overlaps Music.
+    var alwaysShow: Bool {
+        get { defaults.bool(forKey: Key.alwaysShow) }
+        set { defaults.set(newValue, forKey: Key.alwaysShow); onChange?() }
     }
 }

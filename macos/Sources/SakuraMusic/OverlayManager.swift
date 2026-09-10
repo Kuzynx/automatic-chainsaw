@@ -25,7 +25,7 @@ final class OverlayManager {
 
         var orderChanged = false
         for window in tracked {
-            let shouldShow = settings.enabled && !window.occluded
+            let shouldShow = settings.enabled && (!window.occluded || settings.alwaysShow)
             let overlay: OverlayWindow
             if let existing = overlays[window.id] {
                 overlay = existing
