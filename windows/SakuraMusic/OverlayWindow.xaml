@@ -1,0 +1,54 @@
+<Window x:Class="SakuraMusic.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SakuraMusic"
+        Title="Sakura Music Overlay"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Focusable="False"
+        IsHitTestVisible="False"
+        WindowStartupLocation="Manual"
+        Width="400" Height="300">
+    <Grid x:Name="Root">
+        <!-- Blush tint: diagonal wash, a warm bottom-right, a glow behind the branch. -->
+        <Grid x:Name="Tint">
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#33FFB7C5" Offset="0"/>
+                        <GradientStop Color="#0FFFC9D6" Offset="0.5"/>
+                        <GradientStop Color="#1FFFD8B8" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0.5,1" EndPoint="0.5,0.65">
+                        <GradientStop Color="#24C98BB0" Offset="0"/>
+                        <GradientStop Color="#00C98BB0" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle>
+                <Rectangle.Fill>
+                    <RadialGradientBrush Center="0.88,0.04" GradientOrigin="0.88,0.04" RadiusX="0.5" RadiusY="0.6">
+                        <GradientStop Color="#52FFB3CB" Offset="0"/>
+                        <GradientStop Color="#00FFB3CB" Offset="1"/>
+                    </RadialGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
+
+        <local:BranchElement x:Name="Branch"
+                             Width="470" Height="300"
+                             HorizontalAlignment="Right" VerticalAlignment="Top"
+                             ClipToBounds="False"/>
+
+        <local:PetalField x:Name="Petals"/>
+    </Grid>
+</Window>

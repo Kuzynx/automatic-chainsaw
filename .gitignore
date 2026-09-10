@@ -1,0 +1,8 @@
+.build/
+build/
+*.xcodeproj
+.DS_Store
+.swiftpm/
+bin/
+obj/
+*.user
