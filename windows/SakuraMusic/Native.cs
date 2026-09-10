@@ -37,6 +37,8 @@ public static class Native
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
     [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out RECT pvAttribute, int cbAttribute);
     [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out int pvAttribute, int cbAttribute);
+    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] public static extern bool GetLayeredWindowAttributes(IntPtr hwnd, out uint crKey, out byte bAlpha, out uint dwFlags);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct MONITORINFO
@@ -52,6 +54,8 @@ public static class Native
     public const long WS_EX_TOOLWINDOW = 0x00000080;
     public const long WS_EX_LAYERED = 0x00080000;
     public const long WS_EX_NOACTIVATE = 0x08000000;
+
+    public const uint LWA_ALPHA = 0x2;
 
     public const int DWMWA_CLOAKED = 14;
     public const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
@@ -99,6 +103,23 @@ public static class Native
         var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
         if (!GetMonitorInfo(monitor, ref info)) return false;
         return rect.Equals(info.rcMonitor) || rect.Equals(info.rcWork);
+    }
+
+    /// <summary>
+    /// True if the window can actually hide what is under it. Click-through
+    /// overlays, tool palettes and fully transparent layered windows report as
+    /// visible but don't cover anything from the user's point of view.
+    /// </summary>
+    public static bool CanOcclude(IntPtr hWnd)
+    {
+        long ex = GetWindowLongPtr(hWnd, GWL_EXSTYLE).ToInt64();
+        if ((ex & WS_EX_TRANSPARENT) != 0) return false;
+        if ((ex & WS_EX_TOOLWINDOW) != 0) return false;
+        if ((ex & WS_EX_LAYERED) != 0
+            && GetLayeredWindowAttributes(hWnd, out _, out byte alpha, out uint flags)
+            && (flags & LWA_ALPHA) != 0 && alpha == 0)
+            return false;
+        return true;
     }
 
     public static void MakeClickThrough(IntPtr hWnd)

@@ -112,6 +112,7 @@ public partial class App : System.Windows.Application
         menu.Items.Add(new ToolStripSeparator());
         _loginItem = new ToolStripMenuItem("Launch at startup", null, (_, _) => ToggleLaunchAtStartup());
         menu.Items.Add(_loginItem);
+        menu.Items.Add(new ToolStripMenuItem("Copy diagnostics", null, (_, _) => CopyDiagnostics()));
 
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(new ToolStripMenuItem("Quit Sakura Music", null, (_, _) => Shutdown()));
@@ -173,6 +174,22 @@ public partial class App : System.Windows.Application
         System.Windows.MessageBox.Show(
             $"{ex.GetType().Name}: {ex.Message}\n\nDetails were written to:\n{LogPath}",
             "Sakura Music crashed", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private void CopyDiagnostics()
+    {
+        var text = _tracker.Describe();
+        try
+        {
+            System.Windows.Clipboard.SetText(text);
+            System.Windows.MessageBox.Show("Diagnostics copied to the clipboard. Paste them into the bug report.",
+                "Sakura Music", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"{ex.Message}\n\n{text}", "Sakura Music diagnostics",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     // MARK: Startup registration
