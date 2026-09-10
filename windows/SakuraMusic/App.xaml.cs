@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -23,8 +24,20 @@ public partial class App : System.Windows.Application
     private readonly List<ToolStripMenuItem> _petalItems = new();
     private readonly List<ToolStripMenuItem> _blushItems = new();
 
+    private static readonly string LogPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SakuraMusic", "error.log");
+
     public App()
     {
+        DispatcherUnhandledException += (_, args) =>
+        {
+            ReportCrash(args.Exception);
+            args.Handled = true;
+            Shutdown(1);
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            ReportCrash(args.ExceptionObject as Exception ?? new Exception(args.ExceptionObject?.ToString()));
+
         _overlays = new OverlayManager(_settings);
     }
 
@@ -32,6 +45,9 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
         BuildTray();
+        _tray?.ShowBalloonTip(5000, "Sakura Music is running",
+            "Look for the blossom icon in the system tray (click ^ if it's hidden). Open Apple Music to see the petals.",
+            ToolTipIcon.None);
 
         _settings.Changed += () =>
         {
@@ -141,6 +157,22 @@ public partial class App : System.Windows.Application
             _lastStatus = text;
             _statusItem.Text = text;
         }
+    }
+
+    private static void ReportCrash(Exception ex)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogPath)!);
+            File.AppendAllText(LogPath, $"[{DateTime.Now:O}] {ex}\n\n");
+        }
+        catch
+        {
+            // Nothing else to do if even logging fails.
+        }
+        System.Windows.MessageBox.Show(
+            $"{ex.GetType().Name}: {ex.Message}\n\nDetails were written to:\n{LogPath}",
+            "Sakura Music crashed", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     // MARK: Startup registration

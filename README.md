@@ -80,8 +80,10 @@ Or during development, just `dotnet run` from that folder.
 
 ### Using it
 
-1. Launch SakuraMusic.exe. A 🌸 blossom icon appears in the system tray (check the hidden-icons
-   overflow if you don't see it).
+1. Launch SakuraMusic.exe. A notification confirms it's running and a 🌸 blossom icon appears
+   in the system tray. Windows 11 hides new tray icons by default: click the `^` arrow next to
+   the clock to find it, and drag it onto the taskbar to keep it visible.
+   If it ever crashes, a dialog appears and details go to `%APPDATA%\SakuraMusic\error.log`.
 2. Open Apple Music. The theme appears over the Music window.
 3. Right-click the tray icon to adjust **Enabled**, **Petals**, **Blush tint**,
    **Blossom branch**, and **Launch at startup**.
