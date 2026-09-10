@@ -4,7 +4,7 @@ using System.Text;
 namespace SakuraMusic;
 
 /// <summary>Win32 bindings used for window tracking and click-through overlays.</summary>
-internal static class Native
+public static class Native
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT

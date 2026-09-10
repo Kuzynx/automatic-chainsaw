@@ -65,7 +65,7 @@ doesn't need Screen Recording or Accessibility access.
 ## Windows
 
 **Requirements:** Windows 10 or 11, the [Apple Music app from the Microsoft Store](https://apps.microsoft.com/detail/9PFHSD62MV6P),
-and the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+and the [.NET SDK](https://dotnet.microsoft.com/download) (8.0 or newer).
 
 ### Build and run
 

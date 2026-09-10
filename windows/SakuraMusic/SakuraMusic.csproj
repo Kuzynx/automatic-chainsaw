@@ -12,6 +12,15 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Version>1.0.0</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Built for .NET 8 but happy to run on a newer installed runtime (e.g. .NET 9). -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms is only used for the tray icon; keep its namespaces out of the
+         implicit usings so WPF's Color/Brush/Size/Point are unambiguous. -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
 
 </Project>
