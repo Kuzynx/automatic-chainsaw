@@ -84,6 +84,9 @@ Or during development, just `dotnet run` from that folder.
    in the system tray. Windows 11 hides new tray icons by default: click the `^` arrow next to
    the clock to find it, and drag it onto the taskbar to keep it visible.
    If it ever crashes, a dialog appears and details go to `%APPDATA%\SakuraMusic\error.log`.
+   If the theme doesn't appear over Music, the status line at the top of the tray menu says why,
+   and **Copy diagnostics** puts a list of every window the tracker sees on the clipboard for a
+   bug report.
 2. Open Apple Music. The theme appears over the Music window.
 3. Right-click the tray icon to adjust **Enabled**, **Petals**, **Blush tint**,
    **Blossom branch**, and **Launch at startup**.
